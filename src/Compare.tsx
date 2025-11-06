@@ -1,11 +1,11 @@
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 // import { Box } from "./Box";
 import { Slider } from "@/components/ui/slider"
 import "./styles.css"
 import * as THREE from "three";
 import earth_texture from "/src/earth-texture.png" // Assuming this is the correct path
 import moon_texture from "/src/moon_texture.png"
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import { useLoader } from "@react-three/fiber"; // Import useLoader for textures
 
 // --- TYPES ---
@@ -60,6 +60,34 @@ function Sphere({ planet, position, speedMultiplier }: sphereProps) {
   );
 }
 
+// --- ContextLossHandler Component ---
+function ContextLossHandler() {
+  const { gl } = useThree();
+
+  useEffect(() => {
+    const canvas = gl.domElement;
+
+    const handleContextLost = (event: Event) => {
+      event.preventDefault();
+      console.warn('WebGL context lost. Attempting to restore...');
+    };
+
+    const handleContextRestored = () => {
+      console.log('WebGL context restored successfully.');
+    };
+
+    canvas.addEventListener('webglcontextlost', handleContextLost);
+    canvas.addEventListener('webglcontextrestored', handleContextRestored);
+
+    return () => {
+      canvas.removeEventListener('webglcontextlost', handleContextLost);
+      canvas.removeEventListener('webglcontextrestored', handleContextRestored);
+    };
+  }, [gl]);
+
+  return null;
+}
+
 // --- COMPONENT: Compare (Main App) ---
 export default function Compare() {
   // Define planet objects (keeping them outside the render for consistency)
@@ -76,23 +104,33 @@ export default function Compare() {
 
   return (
     <div className="hello-world">
-      <input type="range" min="0.00005" max="1" value="0.00005" readOnly />
-      <Slider
-        value={speedMultiplier}
-        min={0.00005}
-        max={1}
-        step={0.00001}
-        onValueChange={setSpeedMultiplier}
-        className="w-[400px] mb-4"
-      />
-
-      <h1 className="text-2xl"> Compare the sizes of planets </h1>
+      <div className="controls-container">
+        <h1 className="text-2xl"> Compare the sizes of planets </h1>
+        
+        <input type="range" min="0.00005" max="1" value="0.00005" readOnly />
+        <Slider
+          value={speedMultiplier}
+          min={0.00005}
+          max={1}
+          step={0.00001}
+          onValueChange={setSpeedMultiplier}
+          className="w-[400px] mb-4 slider-isolated"
+        />
+      </div>
 
       <Canvas
+        className="canvas-isolated"
         camera={{ position: [0, 0, 15], fov: 75 }}
-        gl={{ antialias: true, powerPreference: "high-performance", alpha: false }}
+        gl={{ 
+          antialias: true, 
+          powerPreference: "high-performance", 
+          alpha: false,
+          preserveDrawingBuffer: true,
+          failIfMajorPerformanceCaveat: false
+        }}
         dpr={[1, 2]}
       >
+        <ContextLossHandler />
         <ambientLight intensity={1.25} />
         <directionalLight position={[10, 10, 5]} intensity={3} />
 

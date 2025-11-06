@@ -20,6 +20,30 @@ body {
   height: 100vh;
   width: 100vw;
 }
+
+/* Controls container - isolated from Canvas */
+.controls-container {
+  position: relative;
+  z-index: 10;
+  padding: 20px;
+  background: transparent;
+}
+
+/* Slider isolation to prevent DOM reflows affecting WebGL */
+.slider-isolated {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Canvas isolation to protect WebGL context */
+.canvas-isolated {
+  position: relative;
+  z-index: 1;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
 h1 {
   color: black;
   font-size: 48pt;
