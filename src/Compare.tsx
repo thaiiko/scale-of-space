@@ -69,9 +69,9 @@ export default function Compare() {
   // Removed isContextLost state and related logic to fix the typing error (2322)
   const [speedMultiplier, setSpeedMultiplier] = useState<number[]>([0.00005])
 
-  const earthPlanet: Planet = useMemo(() => ({ texture: earth_texture, diameter: EARTH_DIAMETER, speed: 1 }), []);
+  const earthPlanet: Planet = useMemo(() => ({ texture: earth_texture, diameter: EARTH_DIAMETER, speed: 1 }), [EARTH_DIAMETER]);
   const comparisonPlanet: Planet = useMemo(() => ({ texture: earth_texture, diameter: 0.25 }), []);
-  const moon: Planet = useMemo(() => ({ texture: moon_texture, diameter: MOON_DIAMETER, speed: 29.5 }), []);
+  const moon: Planet = useMemo(() => ({ texture: moon_texture, diameter: MOON_DIAMETER, speed: 29.5 }), [MOON_DIAMETER]);
   const speed = speedMultiplier[0];
 
   return (
