@@ -5,7 +5,7 @@ import "./styles.css"
 import * as THREE from "three";
 import earth_texture from "/src/earth-texture.png" // Assuming this is the correct path
 import moon_texture from "/src/moon_texture.png"
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useLoader } from "@react-three/fiber"; // Import useLoader for textures
 
 // --- TYPES ---
@@ -51,7 +51,7 @@ function Sphere({ planet, position, speedMultiplier }: sphereProps) {
       onPointerLeave={() => { setHover(false); }}
       ref={mesh}
     >
-      <sphereGeometry args={[radius, 64, 64]} />
+      <sphereGeometry args={[radius, 32, 32]} />
       <meshStandardMaterial
         map={textureMap}
         color={hovered ? "lightgray" : "white"}
@@ -69,9 +69,9 @@ export default function Compare() {
   // Removed isContextLost state and related logic to fix the typing error (2322)
   const [speedMultiplier, setSpeedMultiplier] = useState<number[]>([0.00005])
 
-  const earthPlanet: Planet = { texture: earth_texture, diameter: EARTH_DIAMETER, speed: 1 };
-  const comparisonPlanet: Planet = { texture: earth_texture, diameter: 0.25 };
-  const moon: Planet = { texture: moon_texture, diameter: MOON_DIAMETER, speed: 29.5 };
+  const earthPlanet: Planet = useMemo(() => ({ texture: earth_texture, diameter: EARTH_DIAMETER, speed: 1 }), []);
+  const comparisonPlanet: Planet = useMemo(() => ({ texture: earth_texture, diameter: 0.25 }), []);
+  const moon: Planet = useMemo(() => ({ texture: moon_texture, diameter: MOON_DIAMETER, speed: 29.5 }), []);
   const speed = speedMultiplier[0];
 
   return (
@@ -90,8 +90,8 @@ export default function Compare() {
 
       <Canvas
         camera={{ position: [0, 0, 12], fov: 75 }}
-        gl={{preserveDrawingBuffer: true}}
-        // Removed the onContextLost and onContextRestored props to resolve the type assignment error.
+        gl={{ antialias: true, powerPreference: "high-performance", alpha: false }}
+        dpr={[1, 2]}
       >
         <ambientLight intensity={1.25} />
         <directionalLight position={[10, 10, 5]} intensity={3} />
