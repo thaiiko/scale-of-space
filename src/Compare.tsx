@@ -1,0 +1,105 @@
+import { Canvas, useFrame } from "@react-three/fiber";
+// import { Box } from "./Box";
+import { Slider } from "@/components/ui/slider"
+import "./styles.css"
+import * as THREE from "three";
+import earth_texture from "/src/earth-texture.png" // Assuming this is the correct path
+import moon_texture from "/src/moon_texture.png"
+import { useRef, useState } from "react";
+import { useLoader } from "@react-three/fiber"; // Import useLoader for textures
+
+// --- TYPES ---
+type Planet = {
+  texture: string
+  diameter: number
+  selected?: boolean
+  speed?: number
+}
+
+interface sphereProps {
+  planet: Planet
+  position: [number, number, number], // Added position prop for better placement
+  speedMultiplier: number
+}
+
+// --- Sphere Component ---
+function Sphere({ planet, position, speedMultiplier }: sphereProps) {
+  const [hovered, setHover] = useState(false);
+  // useLoader is safe and memoized, which helps performance
+  const textureMap = useLoader(THREE.TextureLoader, planet.texture);
+
+  let speed: number = 1; // Changed 'var' to 'let'
+  if (planet.speed != null) {
+    speed = 1.0 / planet.speed;
+  }
+
+  const mesh = useRef<THREE.Mesh | null>(null);
+
+  useFrame(() => {
+    // Ensure mesh.current exists before trying to access properties
+    if (mesh.current) {
+      mesh.current.rotation.y += speedMultiplier * speed;
+    }
+  });
+
+  const radius = planet.diameter / 2;
+
+  return (
+    <mesh
+      position={position}
+      onPointerOver={() => { setHover(true); }}
+      onPointerLeave={() => { setHover(false); }}
+      ref={mesh}
+    >
+      <sphereGeometry args={[radius, 64, 64]} />
+      <meshStandardMaterial
+        map={textureMap}
+        color={hovered ? "lightgray" : "white"}
+      />
+    </mesh>
+  );
+}
+
+// --- COMPONENT: Compare (Main App) ---
+export default function Compare() {
+  // Define planet objects (keeping them outside the render for consistency)
+  const EARTH_DIAMETER = 12.742;
+  const MOON_DIAMETER = 3.4748;
+  
+  // Removed isContextLost state and related logic to fix the typing error (2322)
+  const [speedMultiplier, setSpeedMultiplier] = useState<number[]>([0.00005])
+
+  const earthPlanet: Planet = { texture: earth_texture, diameter: EARTH_DIAMETER, speed: 1 };
+  const comparisonPlanet: Planet = { texture: earth_texture, diameter: 0.25 };
+  const moon: Planet = { texture: moon_texture, diameter: MOON_DIAMETER, speed: 29.5 };
+  const speed = speedMultiplier[0];
+
+  return (
+    <div className="hello-world">
+      <input type="range" min="0.00005" max="1" value="0.00005" readOnly />
+      <Slider
+        value={speedMultiplier}
+        min={0.00005}
+        max={1}
+        step={0.00001}
+        onValueChange={setSpeedMultiplier}
+        className="w-[400px] mb-4"
+      />
+
+      <h1 className="text-2xl"> Compare the sizes of planets </h1>
+
+      <Canvas
+        camera={{ position: [0, 0, 12], fov: 75 }}
+        gl={{preserveDrawingBuffer: true}}
+        // Removed the onContextLost and onContextRestored props to resolve the type assignment error.
+      >
+        <ambientLight intensity={1.25} />
+        <directionalLight position={[10, 10, 5]} intensity={3} />
+
+        <Sphere planet={earthPlanet} position={[-1.5, 0, 0]} speedMultiplier={speed} />
+        <Sphere planet={moon} position={[12, 0, 0]} speedMultiplier={speed} />
+        <Sphere planet={comparisonPlanet} position={[1.5, 0, 0]} speedMultiplier={speed} />
+      </Canvas>
+    </div>
+  );
+}
