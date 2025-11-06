@@ -89,7 +89,7 @@ export default function Compare() {
       <h1 className="text-2xl"> Compare the sizes of planets </h1>
 
       <Canvas
-        camera={{ position: [0, 0, 12], fov: 75 }}
+        camera={{ position: [0, 0, 15], fov: 75 }}
         gl={{ antialias: true, powerPreference: "high-performance", alpha: false }}
         dpr={[1, 2]}
       >
