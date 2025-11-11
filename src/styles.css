@@ -23,10 +23,33 @@ body {
 
 /* Controls container - isolated from Canvas */
 .controls-container {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 10;
   padding: 20px;
-  background: transparent;
+  pointer-events: none;
+}
+
+.controls-container > * {
+  pointer-events: auto;
+}
+
+.slider-container {
+  margin-top: 20px;
+  padding: 0 20px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.slider-label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: black;
 }
 
 /* Slider isolation to prevent DOM reflows affecting WebGL */
@@ -36,16 +59,83 @@ body {
   backface-visibility: hidden;
 }
 
+/* Native HTML range input styling */
+.native-slider {
+  width: 100%;
+  height: 8px;
+  border-radius: 5px;
+  background: #e5e7eb;
+  outline: none;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  cursor: pointer;
+}
+
+.native-slider:hover {
+  opacity: 1;
+}
+
+.native-slider:focus {
+  opacity: 1;
+  outline: 2px solid rgba(59, 130, 246, 0.3);
+  outline-offset: 2px;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+.native-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  transition: background 0.2s;
+}
+
+.native-slider::-webkit-slider-thumb:hover {
+  background: #2563eb;
+}
+
+/* Firefox */
+.native-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  transition: background 0.2s;
+}
+
+.native-slider::-moz-range-thumb:hover {
+  background: #2563eb;
+}
+
+/* Track styling for Firefox */
+.native-slider::-moz-range-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 5px;
+  background: #e5e7eb;
+}
+
 /* Canvas isolation to protect WebGL context */
 .canvas-isolated {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   z-index: 1;
   will-change: transform;
   transform: translateZ(0);
+  isolation: isolate;
 }
 
 h1 {
-  color: black;
+  color: white;
   font-size: 48pt;
 }
 

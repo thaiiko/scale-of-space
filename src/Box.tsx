@@ -1,6 +1,6 @@
 import { useFrame } from "@react-three/fiber";
 import{ useState, useRef } from "react";
-import { Mesh } from "three";
+import type { Mesh } from "three";
 
 export function Box() {
     const myMesh = useRef<Mesh>(null);
